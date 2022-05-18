@@ -1,7 +1,6 @@
 **Spring Boot Demo APP using Java+SpringBoot+JPA+Hibernate**
 
-Requirements
-For building and running the application you need,
+Requirement For building and running the Spring Boot Application,
 Implement Rest endpoint to read file persist the data to Database(H2) using JPA+Hbernate,
 Implemnt endpoint to fetch data by orderid from data base Using JPA+Hbernate
 
