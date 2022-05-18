@@ -57,7 +57,7 @@ public class NaceDataController {
             return ResponseEntity.status(HttpStatus.OK).body(FILE_PROCESSING_SUCCESS_MSG);
         } catch (Exception e) {
             String errorMessage = "Exception occurred while Processing file";
-            log.info("Exception occurred while Processing file, ErrorMessage: ", e.getMessage());
+            log.error("Exception occurred while Processing file, ErrorMessage: ", e.getMessage());
             return new ResponseEntity<>(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -84,7 +84,7 @@ public class NaceDataController {
             return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
         } catch (Exception exception) {
             errorResponse.setErrorMessage(String.format("Internal Service Error while fetching Nace Details for Order Id:%s", orderId));
-            log.info("Exception occurred while fetching Nace data for order Id:{} , ErrorMessageL{} ", orderId, exception.getMessage());
+            log.error("Exception occurred while fetching Nace data for order Id:{} , ErrorMessageL{} ", orderId, exception.getMessage());
             return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
