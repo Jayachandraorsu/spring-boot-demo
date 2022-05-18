@@ -62,6 +62,8 @@ public class NaceDataController {
         }
     }
 
+    
+    
     @ApiOperation(value = "This endpoint fetch the Nace Data from Database ", nickname = "fetchNaceDetails", response = NaceDetailsDto.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Found the Nace Details for given Order Id", response = NaceDetailsDto.class),
@@ -88,6 +90,8 @@ public class NaceDataController {
             return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    
+    
 
     @ApiOperation(value = "This endpoint will delete the Nace Data from Database ", nickname = "DeleteNaceDetails", response = String.class)
     @ApiResponses(value = {
