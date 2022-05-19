@@ -1,6 +1,7 @@
 package com.spring.boot.demo.controller;
 
 import com.spring.boot.demo.dto.ErrorResponse;
+import com.spring.boot.demo.dto.NaceDataReponse;
 import com.spring.boot.demo.dto.NaceDetailsDto;
 import com.spring.boot.demo.exception.NoDataFoundException;
 import com.spring.boot.demo.service.NaceService;
@@ -64,30 +65,33 @@ public class NaceDataController {
 
     
     
-    @ApiOperation(value = "This endpoint fetch the Nace Data from Database ", nickname = "fetchNaceDetails", response = NaceDetailsDto.class)
+    @ApiOperation(value = "This endpoint fetch the Nace Data from Database ", nickname = "fetchNaceDetails", response = NaceDataReponse.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Found the Nace Details for given Order Id", response = NaceDetailsDto.class),
+            @ApiResponse(code = 200, message = "Found the Nace Details for given Order Id", response = NaceDataReponse.class ),
             @ApiResponse(code = 401, message = "Unauthorized Access to this information"),
             @ApiResponse(code = 403, message = "Client is Forbidden from accessing this Resource"),
             @ApiResponse(code = 404, message = "Resource Not Found"),
             @ApiResponse(code = 500, message = "Internal server error")
     })
     @RequestMapping(value = GET_NACE_DETAILS_PATH, produces = APPLICATION_JSON_VALUE, method = RequestMethod.GET)
-    public ResponseEntity<?> fetchNaceDetails(@RequestParam(required = true, name = "orderId") Long orderId) {
+    public ResponseEntity<NaceDataReponse> fetchNaceDetails(@RequestParam(required = true, name = "orderId") Long orderId) {
         ErrorResponse errorResponse = new ErrorResponse();
-
+        NaceDataReponse response = new NaceDataReponse();
         try {
             final Optional<NaceDetailsDto> order = naceService.fetchNaceDetailByOrderId(orderId);
             if (order.isPresent()) {
                 log.info("NaceDetails fetched successfully for oderId:{}", orderId);
-                return ResponseEntity.ok(order.get());
+                response.setNaceDetailsDto(order.get());
+                return ResponseEntity.ok(response);
             }
             errorResponse.setErrorMessage(String.format("Nace Details not found for orderId:%s", orderId));
-            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+            response.setErrorResponse(errorResponse);
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         } catch (Exception exception) {
             errorResponse.setErrorMessage(String.format("Internal Service Error while fetching Nace Details for Order Id:%s", orderId));
             log.error("Exception occurred while fetching Nace data for order Id:{} , ErrorMessageL{} ", orderId, exception.getMessage());
-            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+            response.setErrorResponse(errorResponse);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     

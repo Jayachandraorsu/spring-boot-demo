@@ -1,6 +1,7 @@
 package com.spring.boot.demo.controller;
 
 import com.spring.boot.demo.dto.ErrorResponse;
+import com.spring.boot.demo.dto.NaceDataReponse;
 import com.spring.boot.demo.dto.NaceDetailsDto;
 import com.spring.boot.demo.exception.NaceDataProcessingException;
 import com.spring.boot.demo.exception.NoDataFoundException;
@@ -50,28 +51,28 @@ class NaceDataControllerTest {
         naceDetailsDto.setCode("A");
         naceDetailsDto.setItemsAlsoInclude("ItemsAlsoInclude");
         doReturn(Optional.ofNullable(naceDetailsDto)).when(naceService).fetchNaceDetailByOrderId(eq(234342l));
-        ResponseEntity<?> responseEntity = naceDataController.fetchNaceDetails(234342l);
-        NaceDetailsDto response = (NaceDetailsDto) responseEntity.getBody();
-        assertEquals(234342l, response.getOrderId());
-        assertEquals("A", response.getCode());
-        assertEquals("ItemsAlsoInclude", response.getItemsAlsoInclude());
+        ResponseEntity<NaceDataReponse> responseEntity = naceDataController.fetchNaceDetails(234342l);
+        NaceDataReponse response = responseEntity.getBody();
+        assertEquals(234342l, response.getNaceDetailsDto().getOrderId());
+        assertEquals("A", response.getNaceDetailsDto().getCode());
+        assertEquals("ItemsAlsoInclude", response.getNaceDetailsDto().getItemsAlsoInclude());
 
     }
 
     @Test
     public void fetchNaceDetails_whenOrderIdNotExist_shoudReturnErrorMessage() {
         doReturn(Optional.empty()).when(naceService).fetchNaceDetailByOrderId(eq(234342l));
-        ResponseEntity<?> responseEntity = naceDataController.fetchNaceDetails(234342l);
-        ErrorResponse response = (ErrorResponse) responseEntity.getBody();
-        assertEquals("Nace Details not found for orderId:234342", response.getErrorMessage());
+        ResponseEntity<NaceDataReponse> responseEntity = naceDataController.fetchNaceDetails(234342l);
+        NaceDataReponse response = responseEntity.getBody();
+        assertEquals("Nace Details not found for orderId:234342", response.getErrorResponse().getErrorMessage());
     }
 
     @Test
     public void fetchNaceDetails_whenException_shoudReturnSucessMessage() {
         doThrow(RuntimeException.class).when(naceService).fetchNaceDetailByOrderId(eq(234342l));
-        ResponseEntity<?> responseEntity = naceDataController.fetchNaceDetails(234342l);
-        ErrorResponse response = (ErrorResponse) responseEntity.getBody();
-        assertEquals("Internal Service Error while fetching Nace Details for Order Id:234342", response.getErrorMessage());
+        ResponseEntity<NaceDataReponse> responseEntity = naceDataController.fetchNaceDetails(234342l);
+        NaceDataReponse response =  responseEntity.getBody();
+        assertEquals("Internal Service Error while fetching Nace Details for Order Id:234342", response.getErrorResponse().getErrorMessage());
     }
 
     @Test

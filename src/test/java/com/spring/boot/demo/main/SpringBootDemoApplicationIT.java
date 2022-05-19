@@ -1,6 +1,7 @@
 package com.spring.boot.demo.main;
 
 import com.spring.boot.demo.dto.ErrorResponse;
+import com.spring.boot.demo.dto.NaceDataReponse;
 import com.spring.boot.demo.dto.NaceDetailsDto;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
@@ -39,11 +40,12 @@ class SpringBootDemoApplicationIT {
     @Test
     @Order(2)
     public void getNaceDetails_whenOrderIdExist_ShouldReturnNaceDetailsDto() throws JSONException {
-        ResponseEntity<NaceDetailsDto> responseEntity = restTemplate.exchange(
+        ResponseEntity<NaceDataReponse> responseEntity = restTemplate.exchange(
                 createURLWithPort(GET_NACE_DETAILS_PATH + "?orderId=398481"),
-                HttpMethod.GET, null, NaceDetailsDto.class);
-        NaceDetailsDto naceDetailsDto = responseEntity.getBody();
-        assertEquals(398481, naceDetailsDto.getOrderId());
+                HttpMethod.GET, null, NaceDataReponse.class);
+        NaceDataReponse naceDataReponse = responseEntity.getBody();
+        NaceDetailsDto  naceDetailsDto = naceDataReponse.getNaceDetailsDto();
+        assertEquals(398481, naceDataReponse.getNaceDetailsDto().getOrderId());
         assertEquals(1, naceDetailsDto.getLevel());
         assertEquals("A", naceDetailsDto.getCode());
         assertEquals("AGRICULTURE, FORESTRY AND FISHING", naceDetailsDto.getDescription());
@@ -60,12 +62,13 @@ class SpringBootDemoApplicationIT {
     @Test
     @Order(3)
     public void getNaceDetails_whenOrderIdNotExist_ErrorResponse() throws JSONException {
-        ResponseEntity<ErrorResponse> responseEntity = restTemplate.exchange(
+        ResponseEntity<NaceDataReponse> responseEntity = restTemplate.exchange(
                 createURLWithPort(GET_NACE_DETAILS_PATH + "?orderId=39848199"),
-                HttpMethod.GET, null, ErrorResponse.class);
-        ErrorResponse errorResponse = responseEntity.getBody();
-        assertNotNull(errorResponse != null);
-        assertEquals("Nace Details not found for orderId:39848199", errorResponse.getErrorMessage());
+                HttpMethod.GET, null, NaceDataReponse.class);
+        NaceDataReponse naceDataReponse = responseEntity.getBody();
+        assertNotNull(naceDataReponse != null);
+        assertNotNull(naceDataReponse.getErrorResponse() != null);
+        assertEquals("Nace Details not found for orderId:39848199", naceDataReponse.getErrorResponse().getErrorMessage());
     }
 
     @Test
