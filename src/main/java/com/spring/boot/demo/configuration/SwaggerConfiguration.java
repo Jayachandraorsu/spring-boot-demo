@@ -10,15 +10,9 @@ import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
-
-import java.util.function.Predicate;
-
-import static springfox.documentation.builders.PathSelectors.regex;
 
 
 @Slf4j
-@EnableSwagger2
 @Configuration
 public class SwaggerConfiguration {
     @Bean
@@ -27,19 +21,14 @@ public class SwaggerConfiguration {
         return new Docket(DocumentationType.SWAGGER_2)
                 .forCodeGeneration(Boolean.TRUE)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.spring.boot.demo"))
+                .apis(RequestHandlerSelectors.basePackage("com.spring.boot.demo.controller"))
                 .paths(PathSelectors.any())
-                .paths(paths())
                 .build()
                 .apiInfo(apiInfo());
     }
 
-    private Predicate<String> paths() {
-        return regex("/v1/api/naceData/*");
-    }
-
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder().
-                title("Spring Boot Demo").description("Spring Boot Application with  RESTful API following Swagger Specification").build();
+                title("Spring Boot Application Using using JPA+Hibernate").description("Spring Boot Application with  RESTFul API following Swagger Specification").build();
     }
 }

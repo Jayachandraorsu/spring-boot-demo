@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.StopWatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,6 +53,8 @@ public class NaceDataController {
     })
     @RequestMapping(value = PUT_NACE_DETAILS_PATH, produces = TEXT_PLAIN_VALUE, method = RequestMethod.PUT)
     public ResponseEntity<String> putNaceDetails() {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         try {
             naceService.putNaceDetails();
             log.info("File processed successfully");
@@ -60,14 +63,16 @@ public class NaceDataController {
             String errorMessage = "Exception occurred while Processing file";
             log.error("Exception occurred while Processing file, ErrorMessage: ", e.getMessage());
             return new ResponseEntity<>(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
+        } finally {
+            stopWatch.stop();
+            log.info("putNaceDetails completed in {} ms", stopWatch.getTime());
         }
     }
 
-    
-    
+
     @ApiOperation(value = "This endpoint fetch the Nace Data from Database ", nickname = "fetchNaceDetails", response = NaceDataReponse.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Found the Nace Details for given Order Id", response = NaceDataReponse.class ),
+            @ApiResponse(code = 200, message = "Found the Nace Details for given Order Id", response = NaceDataReponse.class),
             @ApiResponse(code = 401, message = "Unauthorized Access to this information"),
             @ApiResponse(code = 403, message = "Client is Forbidden from accessing this Resource"),
             @ApiResponse(code = 404, message = "Resource Not Found"),
@@ -77,6 +82,8 @@ public class NaceDataController {
     public ResponseEntity<NaceDataReponse> fetchNaceDetails(@RequestParam(required = true, name = "orderId") Long orderId) {
         ErrorResponse errorResponse = new ErrorResponse();
         NaceDataReponse response = new NaceDataReponse();
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         try {
             final Optional<NaceDetailsDto> order = naceService.fetchNaceDetailByOrderId(orderId);
             if (order.isPresent()) {
@@ -85,17 +92,20 @@ public class NaceDataController {
                 return ResponseEntity.ok(response);
             }
             errorResponse.setErrorMessage(String.format("Nace Details not found for orderId:%s", orderId));
+            errorResponse.setErrorCode(HttpStatus.NOT_FOUND.value());
             response.setErrorResponse(errorResponse);
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         } catch (Exception exception) {
             errorResponse.setErrorMessage(String.format("Internal Service Error while fetching Nace Details for Order Id:%s", orderId));
+            errorResponse.setErrorCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
             log.error("Exception occurred while fetching Nace data for order Id:{} , ErrorMessageL{} ", orderId, exception.getMessage());
             response.setErrorResponse(errorResponse);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        } finally {
+            stopWatch.stop();
+            log.info("fetchNaceDetails for OrderId {} completed in {} ms", orderId, stopWatch.getTime());
         }
     }
-    
-    
 
     @ApiOperation(value = "This endpoint will delete the Nace Data from Database ", nickname = "DeleteNaceDetails", response = String.class)
     @ApiResponses(value = {
@@ -107,6 +117,8 @@ public class NaceDataController {
     })
     @RequestMapping(value = DELETE_NACE_DETAILS_PATH, produces = TEXT_PLAIN_VALUE, method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteNaceDetails(@RequestParam(required = true, name = "orderId") Long orderId) {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         try {
             naceService.deleteNaceDetailByOrderId(orderId);
             return ResponseEntity.status(HttpStatus.OK).body(String.format(DELETE_PROCESSING_SUCCESS_MSG, orderId));
@@ -117,6 +129,9 @@ public class NaceDataController {
             String errorMessage = String.format("Internal Service Error while deleting  Nace Details for Order Id:%s", orderId);
             log.error("Exception occurred while deleting Nace data for order Id:{} , ErrorMessageL{} ", orderId, exception.getMessage());
             return new ResponseEntity<>(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
+        } finally {
+            stopWatch.stop();
+            log.info("deleteNaceDetails for OrderId {} completed in {} ms", orderId, stopWatch.getTime());
         }
     }
 }
